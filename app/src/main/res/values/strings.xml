@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">NautaConnect</string>
+    <string name="enter_username">Escriba su usuario</string>
+    <string name="enter_password">Escriba su clave</string>
+    <string name="btn_connect">Conectarse</string>
+    <string name="image1_description">App icon</string>
+    <string name="btn_desconnect">Desconectarse</string>
+    <string name="title_activity_dashboard">Dashboard</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
+    <string name="appName">Nauta Connect</string>
+    <string name="appDescription">Conectarse nunca fue tan simple ...</string>
+    <string name="otros_sitios">Sitios de interes</string>
+    <string name="saldoInicial">Saldo inicial</string>
+    <string name="tiempoRestante">Tiempo Restante</string>
+    <string name="tiempoTranscurrido">Tiempo consumido</string>
+    <string name="estadoCuenta">Estado de la cuenta</string>
+    <string name="conectadowifi">Conectado a internet</string>
+    <string name="conectadodatos">Conectado a internet</string>
+    <string name="noconectadowifi">No Conectado</string>
+    <string name="noconectadodatos">No Conectado</string>
+    <string name="estadowifi">WIFI</string>
+    <string name="estadodatos">Datos Moviles</string>
+    <string name="salir">Salir</string>
+    <string name="yaconectadomsg">Usted ya esta conectado a Internet</string>
+</resources>
