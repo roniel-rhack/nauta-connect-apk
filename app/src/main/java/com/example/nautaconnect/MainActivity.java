@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             edit_password.setText("");
         }
 
+        //TODO: Activar esta opcion (si no existe otra) para comprobar si ya esta conectado por WIFI
         boolean isConectedWifi = false;//isConnectedWifi(this);
         boolean isConnectedDatos = isConnectedMobile(this);
 
@@ -90,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
             return reachable;
 
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return false;
