@@ -26,4 +26,6 @@
     <string name="estadodatos">Datos Moviles</string>
     <string name="salir">Salir</string>
     <string name="yaconectadomsg">Usted ya esta conectado a Internet</string>
+    <string name="sinConexion">Usted debe conectarse a una red WIFI</string>
+    <string name="user_passw_error">Usuario o clave incorrecta.</string>
 </resources>

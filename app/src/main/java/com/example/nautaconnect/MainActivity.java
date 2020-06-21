@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,7 +30,9 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity {
 
     EditText edit_username, edit_password;
+    TextView errorsTextView;
     public User my_user;
+    public boolean user_passw_error;
 
 
     @Override
@@ -39,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
         Button btn_connect = findViewById(R.id.buttonConnect);
         edit_username = findViewById(R.id.editUsername);
         edit_password = findViewById(R.id.editPassword);
+        errorsTextView = findViewById(R.id.errorTextView);
+
+        user_passw_error = false;
+
         this.my_user = User.getUser();
         loadUser();
         if (my_user.getUsername()!="prp"){
@@ -49,13 +56,19 @@ public class MainActivity extends AppCompatActivity {
             edit_password.setText("");
         }
 
-        boolean isConectedWifi = isConnectedWifi(this);
+        boolean isConectedWifi = false;//isConnectedWifi(this);
         boolean isConnectedDatos = isConnectedMobile(this);
 
         if (isConectedWifi || isConnectedDatos ){
             Intent intent = new Intent(this, Conectado.class);
             intent.putExtra("CONECTADO_WIFI", isConectedWifi);
             intent.putExtra("CONECTADO_DATOS", isConnectedDatos);
+            startActivity(intent);
+        }
+        if (!isAvailableWifi(this)){
+            Intent intent = new Intent(this, Conectado.class);
+            intent.putExtra("CONECTADO_WIFI", false);
+            intent.putExtra("CONECTADO_DATOS", false);
             startActivity(intent);
         }
 
@@ -68,10 +81,31 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public Boolean isOnlineNet() {
+        try {
+            Process p = java.lang.Runtime.getRuntime().exec("ping -c 1 www.google.es");
+
+            int val = p.waitFor();
+            boolean reachable = (val == 0);
+            return reachable;
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public boolean isConnectedWifi(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI && networkInfo.isAvailable() && networkInfo.isConnected();
+        return networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI && networkInfo.isAvailable() && isOnlineNet();
+    }
+
+    public boolean isAvailableWifi(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI && networkInfo.isAvailable();
     }
 
     public boolean isConnectedMobile(Context context) {
@@ -128,27 +162,37 @@ public class MainActivity extends AppCompatActivity {
                             .data("loggerId", format).data("lang", "es_ES").data("username", my_user.getUsername())
                             .data("password", my_user.getPassword())
                             .data("CSRFHW", my_user.getCSRFHW()).followRedirects(true).post();
+                    if(!post.select("script").last().toString().contains("alert(\"return null\");")){
+                        my_user.setSaldoCuenta(post.select("table#sessioninfo > tbody > tr > td").get(3).text());
+                        my_user.setEstadoCuenta(post.select("table#sessioninfo > tbody > tr > td").get(1).text());
+
+                        Document loggin = Jsoup.connect("https://secure.etecsa.net:8443/LoginServlet")
+                                .data("username", my_user.getUsername()).data("password", my_user.getPassword()).followRedirects(true).post();
+
+                        my_user.setATTRIBUTE_UUID(loggin.select("script").first().toString().split("ATTRIBUTE_UUID=")[1].split("&")[0]);
+
+                        System.out.println(my_user);
+                        sendMessage(null);
+                    }else{
+                        user_passw_error = true;
+                    }
 
 
-                    my_user.setSaldoCuenta(post.select("table#sessioninfo > tbody > tr > td").get(3).text());
-                    my_user.setEstadoCuenta(post.select("table#sessioninfo > tbody > tr > td").get(1).text());
-
-                    Document loggin = Jsoup.connect("https://secure.etecsa.net:8443/LoginServlet")
-                            .data("username", my_user.getUsername()).data("password", my_user.getPassword()).followRedirects(true).post();
-
-                    my_user.setATTRIBUTE_UUID(loggin.select("script").first().toString().split("ATTRIBUTE_UUID=")[1].split("&")[0]);
-
-                    System.out.println(my_user);
-                    sendMessage(null);
                 }catch (Exception e){
                     System.out.println(e.getMessage());
                     builder.append("error: ").append(e.getMessage()).append("\n");
+
 
                 }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         System.out.println(builder.toString());
+                        if (user_passw_error){
+                            errorsTextView.setText(R.string.user_passw_error);
+                            edit_password.setText("");
+                            edit_username.setText("");
+                        }
                     }
                 });
             }

@@ -105,12 +105,12 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/image1"
+                    android:id="@+id/imageWifi"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:background="@drawable/cerclebackgroundpurple"
                     android:padding="10dp"
-                    android:src="@drawable/ic_wifi_ok_24" />
+                    tools:srcCompat="@drawable/ic_wifi_ok_24" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -153,12 +153,12 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/image2"
+                    android:id="@+id/imageDatos"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:background="@drawable/cerclebackgroundpink"
                     android:padding="10dp"
-                    android:src="@drawable/ic_mobile_ok_24" />
+                    tools:srcCompat="@drawable/ic_event_available_24" />
 
                 <TextView
                     android:layout_width="wrap_content"

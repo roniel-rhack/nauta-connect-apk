@@ -95,7 +95,7 @@
                     android:layout_height="64dp"
                     android:background="@drawable/cerclebackgroundpurple"
                     android:padding="10dp"
-                    android:src="@drawable/ic_attach_money_black_24dp" />
+                    app:srcCompat="@drawable/ic_attach_money_black_24dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -143,7 +143,7 @@
                     android:layout_height="64dp"
                     android:background="@drawable/cerclebackgroundpink"
                     android:padding="10dp"
-                    android:src="@drawable/ic_lightbulb_outline_black_24dp" />
+                    app:srcCompat="@drawable/ic_event_available_24" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -198,12 +198,11 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/image3"
+                    android:id="@+id/imageTRestante"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:background="@drawable/cerclebackgroundgreen"
                     android:padding="10dp"
-                    android:src="@drawable/ic_control_point_black_24dp"
                     app:srcCompat="@drawable/ic_time_24" />
 
                 <TextView
@@ -247,12 +246,11 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/image4"
+                    android:id="@+id/imageTConsumido"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:background="@drawable/cerclebackgroundyello"
                     android:padding="10dp"
-                    android:src="@drawable/ic_attach_file_black_24dp"
                     app:srcCompat="@drawable/ic_av_timer_24" />
 
                 <TextView
