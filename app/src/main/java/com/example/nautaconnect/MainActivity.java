@@ -19,8 +19,6 @@ import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
@@ -32,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     EditText edit_username, edit_password;
     TextView errorsTextView;
     public User my_user;
-    public boolean user_passw_error;
+    public int user_passw_error = -1;
 
 
     @Override
@@ -44,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
         edit_password = findViewById(R.id.editPassword);
         errorsTextView = findViewById(R.id.errorTextView);
 
-        user_passw_error = false;
 
         this.my_user = User.getUser();
         loadUser();
@@ -57,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //TODO: Activar esta opcion (si no existe otra) para comprobar si ya esta conectado por WIFI
-        boolean isConectedWifi = false;//isConnectedWifi(this);
+        boolean isConectedWifi = isConnectedWifi(this);
         boolean isConnectedDatos = isConnectedMobile(this);
 
         if (isConectedWifi || isConnectedDatos ){
@@ -69,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         if (!isAvailableWifi(this)){
             Intent intent = new Intent(this, Conectado.class);
             intent.putExtra("CONECTADO_WIFI", false);
-            intent.putExtra("CONECTADO_DATOS", false);
+            intent.putExtra("CONECTADO_DATOS", isConnectedDatos);
             startActivity(intent);
         }
 
@@ -162,24 +159,36 @@ public class MainActivity extends AppCompatActivity {
                             .data("loggerId", format).data("lang", "es_ES").data("username", my_user.getUsername())
                             .data("password", my_user.getPassword())
                             .data("CSRFHW", my_user.getCSRFHW()).followRedirects(true).post();
-                    if(!post.select("script").last().toString().contains("alert(\"return null\");")){
+                    if(!post.select("script").last().toString().contains("alert(\"return null\");")) {
                         my_user.setSaldoCuenta(post.select("table#sessioninfo > tbody > tr > td").get(3).text());
                         my_user.setEstadoCuenta(post.select("table#sessioninfo > tbody > tr > td").get(1).text());
 
                         Document loggin = Jsoup.connect("https://secure.etecsa.net:8443/LoginServlet")
                                 .data("username", my_user.getUsername()).data("password", my_user.getPassword()).followRedirects(true).post();
 
+                        if (loggin.body().toString().contains("El nombre de usuario o contraseña son incorrectos")) {
+                            // La contraseña es incorrecta.
+                            user_passw_error = 1;
+                        } else if (loggin.body().toString().contains("No se pudo autorizar al usuario")) {
+                            // El usuario es incorrecto.
+                            user_passw_error = 2;
+                        } else if (loggin.body().toString().contains("Usted a realizado muchos intentos")) {
+                            // Muchos intentos realizados
+                            user_passw_error = 3;
+                        } else if (loggin.body().toString().contains("Su tarjeta no tiene saldo disponible")) {
+                            // Sin saldo en la cuenta
+                            user_passw_error = 4;
+                        }
+
                         my_user.setATTRIBUTE_UUID(loggin.select("script").first().toString().split("ATTRIBUTE_UUID=")[1].split("&")[0]);
 
-                        System.out.println(my_user);
                         sendMessage(null);
                     }else{
-                        user_passw_error = true;
+                        user_passw_error = 0;
                     }
 
 
                 }catch (Exception e){
-                    System.out.println(e.getMessage());
                     builder.append("error: ").append(e.getMessage()).append("\n");
 
 
@@ -187,11 +196,31 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        System.out.println(builder.toString());
-                        if (user_passw_error){
-                            errorsTextView.setText(R.string.user_passw_error);
-                            edit_password.setText("");
-                            edit_username.setText("");
+                        switch (user_passw_error) {
+                            case 0: {
+                                errorsTextView.setText(R.string.user_passw_error);
+                                edit_password.setText("");
+                                edit_username.setText("");
+                            }
+                            case 1: {
+                                errorsTextView.setText(R.string.user_passw_error);
+                                edit_password.setText("");
+                                edit_username.setText("");
+                            }
+                            case 2: {
+                                errorsTextView.setText(R.string.user_passw_error);
+                                edit_password.setText("");
+                                edit_username.setText("");
+                            }
+                            case 3: {
+                                errorsTextView.setText(R.string.muchos_intentos);
+
+                            }
+                            case 4: {
+                                errorsTextView.setText(R.string.sin_saldo);
+
+                            }
+
                         }
                     }
                 });
